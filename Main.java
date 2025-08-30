@@ -204,44 +204,27 @@ class spawner {
 
     
     public mesh LFYS(double x, double y, double z, int aI, double theta) {
-        double cx = x,cz = z;
+        
         GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][] {
             {
                 new tri(
-                new vec3(-10,  10, 10, 0, 0),  // Top-left
-                new vec3(-10, -10, 10, 0, 1),  // Bottom-left
-                new vec3( 10, -10, 10, 1, 1)   // Bottom-right
+                new vec3(-10+x,  10+y, 10+z, 0, 0),  // Top-left
+                new vec3(-10+x, -10+y, 10+z, 0, 1),  // Bottom-left
+                new vec3( 10+x, -10+y, 10+z, 1, 1)   // Bottom-right
             ),
             new tri(
-                new vec3(-10,  10, 10, 0, 0),  // Top-left
-                new vec3( 10, -10, 10, 1, 1),  // Bottom-right
-                new vec3( 10,  10, 10, 1, 0)
+                new vec3(-10+x,  10+y, 10+z, 0, 0),  // Top-left
+                new vec3( 10+x, -10+y, 10+z, 1, 1),  // Bottom-right
+                new vec3( 10+x,  10+y, 10+z, 1, 0)
             )
             }
-        })}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)));
+        })}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)),theta,x,z);
 
         mesh lfys = LFYS.getMesh(aI);
 
-        double zOffset = 10; // push mesh forward
+        
 
-for (int row = 0; row < lfys.tris.length; row++) {
-    for (int col = 0; col < lfys.tris[row].length; col++) {
-        tri t = lfys.tris[row][col];
 
-        for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
-            double relX = v.x - cx;
-            double relZ = v.z - cz;
-
-            
-            double rotX = relX * Math.cos(theta) - relZ * Math.sin(theta);
-            double rotZ = relX * Math.sin(theta) + relZ * Math.cos(theta);
-
-           
-            v.x = rotX + cx;
-            v.z = rotZ + cz;
-        }
-    }
-}
 
 
         return lfys;
@@ -266,14 +249,36 @@ class AABB {
 class GameObject {
     mesh[] anims;
     AABB hitbox;
-
-    public GameObject(mesh[] anims, AABB hitbox) {
+    double theta,cx,cz;
+    public GameObject(mesh[] anims, AABB hitbox, double theta,double cx,double cz) {
         this.anims = anims;
         this.hitbox = hitbox;
+        this.theta = theta;
+        this.cx = cx;
+        this.cz = cz;
     }
 
     public mesh getMesh(int AnimIndex) {
-        return anims[AnimIndex];
+        mesh lfys = anims[AnimIndex];
+        for (int row = 0; row < lfys.tris.length; row++) {
+    for (int col = 0; col < lfys.tris[row].length; col++) {
+        tri t = lfys.tris[row][col];
+
+        for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
+            double relX = v.x - cx;
+            double relZ = v.z - cz;
+
+            
+            double rotX = relX * Math.cos(theta) - relZ * Math.sin(theta);
+            double rotZ = relX * Math.sin(theta) + relZ * Math.cos(theta);
+
+           
+            v.x = rotX + cx;
+            v.z = rotZ + cz;
+        }
+    }
+}
+return lfys;
     }
 }
 
