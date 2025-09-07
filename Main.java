@@ -308,16 +308,16 @@ class objloader {
             switch (tokens[0]) {
                 case "v":
                     positions.add(new vec3(
-                        Float.parseFloat(tokens[1]) + (float)x,
-                        Float.parseFloat(tokens[2]) + (float)y,
-                        Float.parseFloat(tokens[3]) + (float)z
+                        (double)Float.parseFloat(tokens[1]) + (float)x,
+                        (double)Float.parseFloat(tokens[2]) + (float)y,
+                        (double)Float.parseFloat(tokens[3]) + (float)z,0,0
                     ));
                     break;
 
                 case "vt":
                     uvs.add(new vec2(
-                        Float.parseFloat(tokens[1]),
-                        Float.parseFloat(tokens[2])
+                        (double)Float.parseFloat(tokens[1]),
+                        (double)Float.parseFloat(tokens[2])
                     ));
                     break;
 
