@@ -41,6 +41,7 @@ class dP extends JPanel {
     public void loadTextures() {
         try {
             texture1 = ImageIO.read(new File("dir.png"));
+            String objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println("Texture load failed.");
             e.printStackTrace();
@@ -53,7 +54,7 @@ class dP extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        
+        drawMesh(sp.LFYS(0,0,1,i,i),texture1);
     }
 
     public void drawMesh(mesh ts, Graphics2D g2d, BufferedImage texture) {
@@ -182,25 +183,21 @@ class mesh {
 
 
 class spawner {
-   
-
-    
-    public mesh LFYS(double x, double y, double z, int aI, double theta) {
+    objloader OBJ;
+    public void loadModels() {
+        try {
+            String objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            System.err.println("Texture load failed.");
+            e.printStackTrace();
+        }
+    }
+    public spawner(){
+        loadModels();
+    }
+    public mesh LFYS(double x, double y, double z, int aI, double theta,double psi) {
         
-        GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][] {
-            {
-                new tri(
-                new vec3(-10+x,  10+y, 10+z, 0, 0),  // Top-left
-                new vec3(-10+x, -10+y, 10+z, 0, 1),  // Bottom-left
-                new vec3( 10+x, -10+y, 10+z, 1, 1)   // Bottom-right
-            ),
-            new tri(
-                new vec3(-10+x,  10+y, 10+z, 0, 0),  // Top-left
-                new vec3( 10+x, -10+y, 10+z, 1, 1),  // Bottom-right
-                new vec3( 10+x,  10+y, 10+z, 1, 0)
-            )
-            }
-        })}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)),theta,x,z);
+        GameObject LFYS = new GameObject(new mesh[]{objloader.load(objData,x,y,z)}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)),theta,psi,x,y,z);
 
         mesh lfys = LFYS.getMesh(aI);
 
@@ -232,7 +229,7 @@ class GameObject {
     mesh[] anims;
     AABB hitbox;
     double theta,cx,cz,psi;
-    public GameObject(mesh[] anims, AABB hitbox, double theta,double cx,double cz,double cy) {
+    public GameObject(mesh[] anims, AABB hitbox, double theta,double psi,double cx,double cy,double cz) {
         this.anims = anims;
         this.hitbox = hitbox;
         this.theta = theta;
@@ -353,7 +350,7 @@ public class objloader {
             result[i] = meshGroups.get(i).toArray(new tri[0]);
         }
 
-        return result;
+        return new mesh(result);
     }
 }
 
