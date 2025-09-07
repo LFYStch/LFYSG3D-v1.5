@@ -364,7 +364,6 @@ class objloader {
             result[i] = meshGroups.get(i).toArray(new tri[0]);
         }
 
-        return new mesh(result);
+        return result; // Corrected return statement
     }
 }
-
