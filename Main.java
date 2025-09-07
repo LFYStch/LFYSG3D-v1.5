@@ -184,9 +184,10 @@ class mesh {
 
 class spawner {
     objloader OBJ;
+    String objData;
     public void loadModels() {
         try {
-            String objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
+            objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println("Texture load failed.");
             e.printStackTrace();
@@ -267,7 +268,7 @@ class GameObject {
 
             
             double rotX = relX*Math.cos(psi)+relY*Math.sin(psi);
-            double rotY = relX * Math.sin(psi) - relY * Math.cos(psi;
+            double rotY = relX * Math.sin(psi) - relY * Math.cos(psi);
 
            
             v.x = rotX + cx;
