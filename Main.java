@@ -279,6 +279,7 @@ class GameObject {
 return lfys;
     }
 }
+}
 public class objloader {
     public static tri[][] load(String objData, double x, double y, double z) {
         java.util.List<vec3> positions = new java.util.ArrayList<>();
