@@ -4,6 +4,8 @@ import java.awt.image.*;
 import java.util.*;
 import java.io.*;
 import javax.imageio.*;
+import java.nio.file.*;
+import java.nio.charset.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -280,7 +282,7 @@ return lfys;
     }
 }
 }
-public class objloader {
+class objloader {
     public static tri[][] load(String objData, double x, double y, double z) {
         java.util.List<vec3> positions = new java.util.ArrayList<>();
         java.util.List<vec2> uvs = new java.util.ArrayList<>();
