@@ -288,8 +288,9 @@ class GameObject {
         }
     }
 }
-return lfys;
+
     }
+        return lfys;
 }
 }
 class objloader {
