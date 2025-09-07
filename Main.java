@@ -265,8 +265,8 @@ class GameObject {
             v.z = rotZ + cz;
         }
     }
-            for ( row < lfys.tris.length; row++) {
-    for ( col < lfys.tris[row].length; col++) {
+            for (row = 0; row < lfys.tris.length; row++) {
+    for (col = 0; col < lfys.tris[row].length; col++) {
         tri t = lfys.tris[row][col];
 
         for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
