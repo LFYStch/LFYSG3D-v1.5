@@ -53,10 +53,7 @@ class dP extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        mesh LFYS = sp.LFYS(0, 0, 20, 0, i);
-        drawMesh(LFYS, g2d, texture1);
         
-
     }
 
     public void drawMesh(mesh ts, Graphics2D g2d, BufferedImage texture) {
@@ -182,25 +179,10 @@ class mesh {
     }
 }
 
-class tester {
-    mesh m;
-    public tester(double x, double y, double z) {
-        m = new mesh(new tri[][] {
-            {
-                new tri(
-                    new vec3(x - 5, y - 5, z + 5, 0, 0),
-                    new vec3(x - 5, y + 5, z + 5, 0, 1),
-                    new vec3(x + 5, y + 5, z + 5, 1, 1)
-                )
-            }
-        });
-    }
-}
+
 
 class spawner {
-    public mesh test(double x, double y, double z) {
-        return new tester(x, y, z).m;
-    }
+   
 
     
     public mesh LFYS(double x, double y, double z, int aI, double theta) {
@@ -249,13 +231,14 @@ class AABB {
 class GameObject {
     mesh[] anims;
     AABB hitbox;
-    double theta,cx,cz;
-    public GameObject(mesh[] anims, AABB hitbox, double theta,double cx,double cz) {
+    double theta,cx,cz,psi;
+    public GameObject(mesh[] anims, AABB hitbox, double theta,double cx,double cz,double cy) {
         this.anims = anims;
         this.hitbox = hitbox;
         this.theta = theta;
         this.cx = cx;
         this.cz = cz;
+        this.cy = cy;
     }
 
     public mesh getMesh(int AnimIndex) {
@@ -275,6 +258,23 @@ class GameObject {
            
             v.x = rotX + cx;
             v.z = rotZ + cz;
+        }
+    }
+            for (int row = 0; row < lfys.tris.length; row++) {
+    for (int col = 0; col < lfys.tris[row].length; col++) {
+        tri t = lfys.tris[row][col];
+
+        for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
+            double relX = v.x - cx;
+            double relY = v.y - cy;
+
+            
+            double rotX = relX*Math.cos(psi)+relY*Math.sin(psi);
+            double rotY = relX * Math.sin(psi) - relY * Math.cos(psi;
+
+           
+            v.x = rotX + cx;
+            v.z = rotY + cy;
         }
     }
 }
