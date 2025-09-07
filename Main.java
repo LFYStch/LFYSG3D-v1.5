@@ -56,7 +56,7 @@ class dP extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        drawMesh(sp.LFYS(0,0,1,i,i),texture1);
+        drawMesh(sp.LFYS(0,0,1,0,i,i),g2d,texture1);
     }
 
     public void drawMesh(mesh ts, Graphics2D g2d, BufferedImage texture) {
@@ -193,29 +193,34 @@ class spawner {
     objloader OBJ;
     String objData;
     public void loadModels() {
-        try {
-            objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            System.err.println("Texture load failed.");
-            e.printStackTrace();
-        }
+    Path path = Paths.get("Cube.obj");
+    if (!Files.exists(path)) {
+        System.err.println("Model file not found: " + path.toString());
+        return; // Exit the method if the file does not exist
     }
+    
+    try {
+        objData = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+        System.err.println("Failed to load model data.");
+        e.printStackTrace();
+    }
+}
+
     public spawner(){
         loadModels();
     }
-    public mesh LFYS(double x, double y, double z, int aI, double theta,double psi) {
-        
-        GameObject LFYS = new GameObject(new mesh[]{objloader.load(objData,x,y,z)}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)),theta,psi,x,y,z);
-
-        mesh lfys = LFYS.getMesh(aI);
-
-        
-
-
-
-
-        return lfys;
+    public mesh LFYS(double x, double y, double z, int aI, double theta, double psi) {
+    mesh loadedMesh = new mesh(objloader.load(objData, x, y, z));
+    if (loadedMesh == null) {
+        System.err.println("Failed to load mesh data.");
+        return null; // Handle the null case appropriately
     }
+
+    GameObject LFYS = new GameObject(new mesh[]{loadedMesh}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
+    return LFYS.getMesh(aI);
+}
+
 }
 
 
