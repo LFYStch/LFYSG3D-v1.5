@@ -168,10 +168,15 @@ class vec2 {
 
 class tri {
     vec3 v1, v2, v3;
-    public tri(vec3 v1, vec3 v2, vec3 v3) {
+    vec2 uv1, uv2, uv3; // Add texture coordinates
+
+    public tri(vec3 v1, vec3 v2, vec3 v3, vec2 uv1, vec2 uv2, vec2 uv3) {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
+        this.uv1 = uv1; // Initialize texture coordinates
+        this.uv2 = uv2;
+        this.uv3 = uv3;
     }
 }
 
@@ -231,7 +236,7 @@ class AABB {
 class GameObject {
     mesh[] anims;
     AABB hitbox;
-    double theta,cx,cz,psi;
+    double theta,cx,cz,cy,psi;
     public GameObject(mesh[] anims, AABB hitbox, double theta,double psi,double cx,double cy,double cz) {
         this.anims = anims;
         this.hitbox = hitbox;
@@ -260,8 +265,8 @@ class GameObject {
             v.z = rotZ + cz;
         }
     }
-            for (int row = 0; row < lfys.tris.length; row++) {
-    for (int col = 0; col < lfys.tris[row].length; col++) {
+            for ( row < lfys.tris.length; row++) {
+    for ( col < lfys.tris[row].length; col++) {
         tri t = lfys.tris[row][col];
 
         for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
