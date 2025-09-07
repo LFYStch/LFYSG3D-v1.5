@@ -193,7 +193,7 @@ class spawner {
     objloader OBJ;
     String objData;
     public void loadModels() {
-    Path path = Paths.get("Cube.obj");
+    Path path = Paths.get("cube.obj");
     if (!Files.exists(path)) {
         System.err.println("Model file not found: " + path.toString());
         return; // Exit the method if the file does not exist
