@@ -42,7 +42,7 @@ class dP extends JPanel {
     public void loadTextures() {
         try {
             texture1 = ImageIO.read(new File("dir.png"));
-            String objData = new String(Files.readAllBytes(Paths.get("Cube.obj")), StandardCharsets.UTF_8);
+            
         } catch (IOException e) {
             System.err.println("Texture load failed.");
             e.printStackTrace();
@@ -167,15 +167,12 @@ class vec2 {
 
 class tri {
     vec3 v1, v2, v3;
-    vec2 uv1, uv2, uv3; // Add texture coordinates
-
-    public tri(vec3 v1, vec3 v2, vec3 v3, vec2 uv1, vec2 uv2, vec2 uv3) {
+    
+    public tri(vec3 v1, vec3 v2, vec3 v3) {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
-        this.uv1 = uv1; // Initialize texture coordinates
-        this.uv2 = uv2;
-        this.uv3 = uv3;
+        
     }
 }
 
@@ -195,7 +192,7 @@ class spawner {
         new tri(
             new vec3(0,0,1,0,0),
             new vec3(10,0,1,1,0),
-            new vec3(0,10,1,0,1)
+            new vec3(0,10,1,0,1),
         )
     }})}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
     return LFYS.getMesh(aI);
