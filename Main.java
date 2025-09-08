@@ -189,26 +189,6 @@ class mesh {
 
 
 class spawner {
-    objloader OBJ;
-    String objData;
-    public void loadModels() {
-    Path path = Paths.get("cube.obj");
-    if (!Files.exists(path)) {
-        System.err.println("Model file not found: " + path.toString());
-        return; // Exit the method if the file does not exist
-    }
-    
-    try {
-        objData = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-    } catch (IOException e) {
-        System.err.println("Failed to load model data.");
-        e.printStackTrace();
-    }
-}
-
-    public spawner(){
-        loadModels();
-    }
     public mesh LFYS(double x, double y, double z, int aI, double theta, double psi) {
     
     GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][]{{
