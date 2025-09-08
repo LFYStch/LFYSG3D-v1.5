@@ -188,13 +188,15 @@ class mesh {
 class spawner {
     public mesh LFYS(double x, double y, double z, int aI, double theta, double psi) {
     
-    GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][]{{
+    GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][]{
+        {
         new tri(
-            new vec3(0,0,1,0,0),
-            new vec3(10,0,1,1,0),
-            new vec3(0,10,1,0,1),
+            new vec3(0+x,0+y,1+z,0,0),
+            new vec3(10+x,0+y,1+z,1,0),
+            new vec3(0+x,10+y,1+z,0,1)
         )
-    }})}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
+        }
+    })}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
     return LFYS.getMesh(aI);
 }
 
