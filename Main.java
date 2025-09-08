@@ -4,8 +4,7 @@ import java.awt.image.*;
 import java.util.*;
 import java.io.*;
 import javax.imageio.*;
-import java.nio.file.*;
-import java.nio.charset.*;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -211,13 +210,14 @@ class spawner {
         loadModels();
     }
     public mesh LFYS(double x, double y, double z, int aI, double theta, double psi) {
-    mesh loadedMesh = new mesh(objloader.load(objData, x, y, z));
-    if (loadedMesh == null) {
-        System.err.println("Failed to load mesh data.");
-        return null; // Handle the null case appropriately
-    }
-
-    GameObject LFYS = new GameObject(new mesh[]{loadedMesh}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
+    
+    GameObject LFYS = new GameObject(new mesh[]{new mesh(new tri[][]{{
+        new tri(
+            new vec3(0,0,1,0,0),
+            new vec3(10,0,1,1,0),
+            new vec3(0,10,1,0,1)
+        )
+    }})}, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
     return LFYS.getMesh(aI);
 }
 
@@ -292,79 +292,4 @@ class GameObject {
     }
         return lfys;
 }
-}
-class objloader {
-    public static tri[][] load(String objData, double x, double y, double z) {
-        java.util.List<vec3> positions = new java.util.ArrayList<>();
-        java.util.List<vec2> uvs = new java.util.ArrayList<>();
-        java.util.List<java.util.List<tri>> meshGroups = new java.util.ArrayList<>();
-        java.util.List<tri> currentGroup = new java.util.ArrayList<>();
-
-        String[] lines = objData.split("\n");
-        for (String line : lines) {
-            line = line.trim();
-            if (line.isEmpty() || line.startsWith("#")) continue;
-
-            String[] tokens = line.split("\\s+");
-            switch (tokens[0]) {
-                case "v":
-                    positions.add(new vec3(
-                        (double)Float.parseFloat(tokens[1]) + (float)x,
-                        (double)Float.parseFloat(tokens[2]) + (float)y,
-                        (double)Float.parseFloat(tokens[3]) + (float)z,0,0
-                    ));
-                    break;
-
-                case "vt":
-                    uvs.add(new vec2(
-                        (double)Float.parseFloat(tokens[1]),
-                        (double)Float.parseFloat(tokens[2])
-                    ));
-                    break;
-
-                case "f":
-                    if (tokens.length < 4) break;
-
-                    vec3[] verts = new vec3[3];
-                    vec2[] texs = new vec2[3];
-
-                    for (int i = 0; i < 3; i++) {
-                        String[] parts = tokens[i + 1].split("/");
-                        int vi = Integer.parseInt(parts[0]) - 1;
-                        verts[i] = positions.get(vi);
-
-                        if (parts.length > 1 && !parts[1].isEmpty()) {
-                            int ti = Integer.parseInt(parts[1]) - 1;
-                            texs[i] = uvs.get(ti);
-                        } else {
-                            texs[i] = new vec2(0, 0);
-                        }
-                    }
-
-                    currentGroup.add(new tri(
-                        verts[0], verts[1], verts[2],
-                        texs[0], texs[1], texs[2]
-                    ));
-                    break;
-
-                case "o": case "g":
-                    if (!currentGroup.isEmpty()) {
-                        meshGroups.add(currentGroup);
-                        currentGroup = new java.util.ArrayList<>();
-                    }
-                    break;
-            }
-        }
-
-        if (!currentGroup.isEmpty()) {
-            meshGroups.add(currentGroup);
-        }
-
-        tri[][] result = new tri[meshGroups.size()][];
-        for (int i = 0; i < meshGroups.size(); i++) {
-            result[i] = meshGroups.get(i).toArray(new tri[0]);
-        }
-
-        return result; // Corrected return statement
-    }
 }
