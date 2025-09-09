@@ -105,7 +105,9 @@ class dP extends JPanel {
                 }
             }
 
-            if (t.v1.z < light_source1.z) {
+            double avgZ = (t.v1.z + t.v2.z + t.v3.z) / 3.0;
+if (avgZ < light_source1.z)
+ {
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
                 g2d.setColor(Color.WHITE);
                 g2d.fillPolygon(xPoints, yPoints, 3);
@@ -263,7 +265,7 @@ class GameObject {
 
            
             v.x = rotX + cx;
-            v.z = rotY + cy;
+            v.y = rotY + cy;
         }
     }
 }
