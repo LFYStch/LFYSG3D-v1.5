@@ -329,4 +329,4 @@ class Objloader{
     }
 
     return new mesh(new tri[][] { triangles.toArray(new tri[0]) });
-}
+}}
