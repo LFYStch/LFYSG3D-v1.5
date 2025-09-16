@@ -31,7 +31,7 @@ class dP extends JPanel {
 
     public dP() {
         setDoubleBuffered(true);
-        cam = new vec3(0, -10, 0, 0, 0);
+        cam = new vec3(0, 0, -10, 0, 0);
         light_source1 = new vec3(cam.x, cam.y, cam.z - 2, 0, 0);
         camYaw = 0;
         camPitch = 0;
