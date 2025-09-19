@@ -304,13 +304,14 @@ class Objloader {
                     }
 
                     case "f": {
-                        for (int i = 1; i <= 3; i++) {
-                            String[] tokens = parts[i].split("/");
+                        vec3[] faceVerts = new vec3[3];
+                        for (int i = 0; i < 3; i++) {
+                            String[] tokens = parts[i + 1].split("/");
                             int vIdx = Integer.parseInt(tokens[0]) - 1;
                             int uvIdx = tokens.length > 1 ? Integer.parseInt(tokens[1]) - 1 : 0;
 
                             vec3 base = vertices.get(vIdx);
-                            vec3 copy = base.copy(); // Deep copy to avoid shared mutation
+                            vec3 copy = base.copy();
 
                             if (!uvs.isEmpty()) {
                                 vec2 uv = uvs.get(uvIdx);
@@ -318,14 +319,10 @@ class Objloader {
                                 copy.v = uv.y;
                             }
 
-                            vertices.add(copy); // Optional: store expanded vertex list
+                            faceVerts[i] = copy;
                         }
 
-                        vec3 v1 = vertices.get(vertices.size() - 3);
-                        vec3 v2 = vertices.get(vertices.size() - 2);
-                        vec3 v3 = vertices.get(vertices.size() - 1);
-
-                        triangles.add(new tri(v1, v2, v3));
+                        triangles.add(new tri(faceVerts[0], faceVerts[1], faceVerts[2]));
                         break;
                     }
                 }
