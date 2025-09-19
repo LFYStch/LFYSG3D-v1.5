@@ -224,57 +224,52 @@ class GameObject {
     mesh[] anims;
     AABB hitbox;
     double theta,cx,cz,cy,psi;
-    public GameObject(mesh[] anims, AABB hitbox, double theta,double psi,double cx,double cy,double cz) {
+  class GameObject {
+    mesh[] anims;
+    AABB hitbox;
+    double theta, cx, cy, cz, psi;
+
+    public GameObject(mesh[] anims, AABB hitbox, double theta, double psi, double cx, double cy, double cz) {
         this.anims = anims;
         this.hitbox = hitbox;
         this.theta = theta;
+        this.psi = psi;
         this.cx = cx;
-        this.cz = cz;
         this.cy = cy;
+        this.cz = cz;
     }
 
     public mesh getMesh(int AnimIndex) {
         mesh lfys = anims[AnimIndex];
-        for (int row = 0; row < lfys.tris.length; row++) {
-    for (int col = 0; col < lfys.tris[row].length; col++) {
-        tri t = lfys.tris[row][col];
 
-        for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
-            double relX = v.x - cx;
-            double relZ = v.z - cz;
+        for (tri[] row : lfys.tris) {
+            for (tri t : row) {
+                for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
+                    // Translate to origin
+                    double x = v.x - cx;
+                    double y = v.y - cy;
+                    double z = v.z - cz;
 
-            
-            double rotX = relX * Math.cos(theta) - relZ * Math.sin(theta);
-            double rotZ = relX * Math.sin(theta) + relZ * Math.cos(theta);
+                    // Y-axis rotation (theta)
+                    double x1 = x * Math.cos(theta) - z * Math.sin(theta);
+                    double z1 = x * Math.sin(theta) + z * Math.cos(theta);
 
-           
-            v.x = rotX + cx;
-            v.z = rotZ + cz;
+                    // X-axis rotation (psi)
+                    double y2 = y * Math.cos(psi) - z1 * Math.sin(psi);
+                    double z2 = y * Math.sin(psi) + z1 * Math.cos(psi);
+
+                    // Translate back
+                    v.x = x1 + cx;
+                    v.y = y2 + cy;
+                    v.z = z2 + cz;
+                }
+            }
         }
-    }
-            for (int ro = 0; ro < lfys.tris.length; ro++) {
-    for (int co = 0; co < lfys.tris[ro].length; co++) {
-        tri t = lfys.tris[ro][co];
 
-        for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
-            double relX = v.x - cx;
-            double relY = v.y - cy;
-
-            
-            double rotX = relX*Math.cos(psi)+relY*Math.sin(psi);
-            double rotY = relX * Math.sin(psi) - relY * Math.cos(psi);
-
-           
-            v.x = rotX + cx;
-            v.y = rotY + cy;
-        }
-    }
-}
-
-    }
         return lfys;
+    }
 }
-}
+
 class Objloader {
     public mesh load(String path, double offsetX, double offsetY, double offsetZ) {
         java.util.List<vec3> vertices = new java.util.ArrayList<>();
