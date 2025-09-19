@@ -141,6 +141,10 @@ class vec3 {
         this.u = u;
         this.v = v;
     }
+    public vec3 copy() {
+    return new vec3(this.x, this.y, this.z, this.u, this.v);
+}
+
 
     public vec2 project(vec3 cam, double yaw, double pitch) {
         double nX = this.x - cam.x;
@@ -271,62 +275,65 @@ class GameObject {
         return lfys;
 }
 }
-class Objloader{
+class Objloader {
     public mesh load(String path, double offsetX, double offsetY, double offsetZ) {
-    java.util.List<vec3> vertices = new java.util.ArrayList<>();
-    java.util.List<vec2> uvs = new java.util.ArrayList<>();
-    java.util.List<tri> triangles = new java.util.ArrayList<>();
+        java.util.List<vec3> vertices = new java.util.ArrayList<>();
+        java.util.List<vec2> uvs = new java.util.ArrayList<>();
+        java.util.List<tri> triangles = new java.util.ArrayList<>();
 
-    try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-        String line;
-        while ((line = br.readLine()) != null) {
-            String[] parts = line.trim().split("\\s+");
-            if (parts.length == 0) continue;
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 0) continue;
 
-            switch (parts[0]) {
-                case "v": // Vertex
-                    double x = Double.parseDouble(parts[1]) + offsetX;
-                    double y = Double.parseDouble(parts[2]) + offsetY;
-                    double z = Double.parseDouble(parts[3]) + offsetZ;
-                    vertices.add(new vec3(x, y, z, 0, 0));
-                    break;
-
-                case "vt": // Texture coordinate
-                    double u = Double.parseDouble(parts[1]);
-                    double v = Double.parseDouble(parts[2]);
-                    uvs.add(new vec2(u, v));
-                    break;
-
-                case "f": // Face
-                    int[] idx = new int[3];
-                    int[] uvIdx = new int[3];
-                    for (int i = 0; i < 3; i++) {
-                        String[] tokens = parts[i + 1].split("/");
-                        idx[i] = Integer.parseInt(tokens[0]) - 1;
-                        uvIdx[i] = tokens.length > 1 ? Integer.parseInt(tokens[1]) - 1 : 0;
+                switch (parts[0]) {
+                    case "v": {
+                        double x = Double.parseDouble(parts[1]) + offsetX;
+                        double y = Double.parseDouble(parts[2]) + offsetY;
+                        double z = Double.parseDouble(parts[3]) + offsetZ;
+                        vertices.add(new vec3(x, y, z, 0, 0));
+                        break;
                     }
 
-                    vec3 v1 = vertices.get(idx[0]);
-                    vec3 v2 = vertices.get(idx[1]);
-                    vec3 v3 = vertices.get(idx[2]);
-
-                    if (!uvs.isEmpty()) {
-                        vec2 uv1 = uvs.get(uvIdx[0]);
-                        vec2 uv2 = uvs.get(uvIdx[1]);
-                        vec2 uv3 = uvs.get(uvIdx[2]);
-
-                        v1.u = uv1.x; v1.v = uv1.y;
-                        v2.u = uv2.x; v2.v = uv2.y;
-                        v3.u = uv3.x; v3.v = uv3.y;
+                    case "vt": {
+                        double u = Double.parseDouble(parts[1]);
+                        double v = 1.0 - Double.parseDouble(parts[2]); // Flip V if needed
+                        uvs.add(new vec2(u, v));
+                        break;
                     }
 
-                    triangles.add(new tri(v1, v2, v3));
-                    break;
+                    case "f": {
+                        for (int i = 1; i <= 3; i++) {
+                            String[] tokens = parts[i].split("/");
+                            int vIdx = Integer.parseInt(tokens[0]) - 1;
+                            int uvIdx = tokens.length > 1 ? Integer.parseInt(tokens[1]) - 1 : 0;
+
+                            vec3 base = vertices.get(vIdx);
+                            vec3 copy = base.copy(); // Deep copy to avoid shared mutation
+
+                            if (!uvs.isEmpty()) {
+                                vec2 uv = uvs.get(uvIdx);
+                                copy.u = uv.x;
+                                copy.v = uv.y;
+                            }
+
+                            vertices.add(copy); // Optional: store expanded vertex list
+                        }
+
+                        vec3 v1 = vertices.get(vertices.size() - 3);
+                        vec3 v2 = vertices.get(vertices.size() - 2);
+                        vec3 v3 = vertices.get(vertices.size() - 1);
+
+                        triangles.add(new tri(v1, v2, v3));
+                        break;
+                    }
+                }
             }
+        } catch (IOException e) {
+            System.err.println("OBJ load failed: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.err.println("OBJ load failed: " + e.getMessage());
-    }
 
-    return new mesh(new tri[][] { triangles.toArray(new tri[0]) });
-}}
+        return new mesh(new tri[][] { triangles.toArray(new tri[0]) });
+    }
+}
