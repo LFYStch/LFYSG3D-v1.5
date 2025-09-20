@@ -220,10 +220,7 @@ class AABB {
                aabbO.min.z > aabbT.max.z && aabbO.min.z < aabbT.max.z;
     }
 }
-class GameObject {
-    mesh[] anims;
-    AABB hitbox;
-    double theta,cx,cz,cy,psi;
+
   class GameObject {
     mesh[] anims;
     AABB hitbox;
