@@ -224,13 +224,13 @@ class AABB {
   class GameObject {
     mesh[] anims;
     AABB hitbox;
-    double theta, cx, cy, cz, psi;
+    double theta, phi, cx, cy, cz;
 
-    public GameObject(mesh[] anims, AABB hitbox, double theta, double psi, double cx, double cy, double cz) {
+    public GameObject(mesh[] anims, AABB hitbox, double theta, double phi, double cx, double cy, double cz) {
         this.anims = anims;
         this.hitbox = hitbox;
-        this.theta = theta;
-        this.psi = psi;
+        this.theta = theta; // Y-axis rotation
+        this.phi = phi;     // Z-axis rotation
         this.cx = cx;
         this.cy = cy;
         this.cz = cz;
@@ -247,18 +247,18 @@ class AABB {
                     double y = v.y - cy;
                     double z = v.z - cz;
 
-                    // Y-axis rotation (theta)
+                    // Y-axis rotation (around vertical axis)
                     double x1 = x * Math.cos(theta) - z * Math.sin(theta);
                     double z1 = x * Math.sin(theta) + z * Math.cos(theta);
 
-                    // X-axis rotation (psi)
-                    double y2 = y * Math.cos(psi) - z1 * Math.sin(psi);
-                    double z2 = y * Math.sin(psi) + z1 * Math.cos(psi);
+                    // Z-axis rotation (around forward axis)
+                    double x2 = x1 * Math.cos(phi) - y * Math.sin(phi);
+                    double y2 = x1 * Math.sin(phi) + y * Math.cos(phi);
 
                     // Translate back
-                    v.x = x1 + cx;
+                    v.x = x2 + cx;
                     v.y = y2 + cy;
-                    v.z = z2 + cz;
+                    v.z = z1 + cz;
                 }
             }
         }
@@ -266,6 +266,7 @@ class AABB {
         return lfys;
     }
 }
+
 
 class Objloader {
     public mesh load(String path, double offsetX, double offsetY, double offsetZ) {
