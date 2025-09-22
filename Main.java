@@ -298,12 +298,13 @@ class AABB {
 
 
 class Objloader {
-    public mesh load(String path, double offsetX, double offsetY, double offsetZ, double scale) {
-        java.util.List<vec3> vertices = new java.util.ArrayList<>();
+    public mesh load(String path, double centerX, double centerY, double centerZ, double scale) {
+        java.util.List<vec3> rawVerts = new java.util.ArrayList<>();
         java.util.List<vec2> uvs = new java.util.ArrayList<>();
         java.util.List<vec3> normals = new java.util.ArrayList<>();
         java.util.List<tri> triangles = new java.util.ArrayList<>();
 
+        // First pass: collect raw vertices
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -312,16 +313,16 @@ class Objloader {
 
                 switch (parts[0]) {
                     case "v": {
-                        double x = Double.parseDouble(parts[1]) + offsetX;
-                        double y = Double.parseDouble(parts[2]) + offsetY;
-                        double z = Double.parseDouble(parts[3]) + offsetZ;
-                        vertices.add(new vec3(x * scale, y * scale, z * scale, 0, 0));
+                        double x = Double.parseDouble(parts[1]);
+                        double y = Double.parseDouble(parts[2]);
+                        double z = Double.parseDouble(parts[3]);
+                        rawVerts.add(new vec3(x, y, z, 0, 0));
                         break;
                     }
 
                     case "vt": {
                         double u = Double.parseDouble(parts[1]);
-                        double v = 1.0 - Double.parseDouble(parts[2]); // Flip V if needed
+                        double v = 1.0 - Double.parseDouble(parts[2]);
                         uvs.add(new vec2(u, v));
                         break;
                     }
@@ -330,44 +331,78 @@ class Objloader {
                         double nx = Double.parseDouble(parts[1]);
                         double ny = Double.parseDouble(parts[2]);
                         double nz = Double.parseDouble(parts[3]);
-                        normals.add(new vec3(nx, ny, nz, 0, 0)); // Only x,y,z used for normal
-                        break;
-                    }
-
-                    case "f": {
-                        vec3[] faceVerts = new vec3[3];
-                        for (int i = 0; i < 3; i++) {
-                            String[] tokens = parts[i + 1].split("/");
-                            int vIdx = Integer.parseInt(tokens[0]) - 1;
-                            int uvIdx = tokens.length > 1 && !tokens[1].isEmpty() ? Integer.parseInt(tokens[1]) - 1 : -1;
-                            int nIdx = tokens.length > 2 && !tokens[2].isEmpty() ? Integer.parseInt(tokens[2]) - 1 : -1;
-
-                            vec3 base = vertices.get(vIdx);
-                            vec3 copy = base.copy();
-
-                            if (uvIdx >= 0 && uvIdx < uvs.size()) {
-                                vec2 uv = uvs.get(uvIdx);
-                                copy.u = uv.x;
-                                copy.v = uv.y;
-                            }
-
-                            if (nIdx >= 0 && nIdx < normals.size()) {
-                                vec3 normal = normals.get(nIdx);
-                                copy.nx = normal.x;
-                                copy.ny = normal.y;
-                                copy.nz = normal.z;
-                            }
-
-                            faceVerts[i] = copy;
-                        }
-
-                        triangles.add(new tri(faceVerts[0], faceVerts[1], faceVerts[2]));
+                        normals.add(new vec3(nx, ny, nz, 0, 0));
                         break;
                     }
                 }
             }
         } catch (IOException e) {
             System.err.println("OBJ load failed: " + e.getMessage());
+        }
+
+        // Compute original center
+        double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY, minZ = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
+
+        for (vec3 v : rawVerts) {
+            minX = Math.min(minX, v.x);
+            minY = Math.min(minY, v.y);
+            minZ = Math.min(minZ, v.z);
+            maxX = Math.max(maxX, v.x);
+            maxY = Math.max(maxY, v.y);
+            maxZ = Math.max(maxZ, v.z);
+        }
+
+        double origCenterX = (minX + maxX) / 2.0;
+        double origCenterY = (minY + maxY) / 2.0;
+        double origCenterZ = (minZ + maxZ) / 2.0;
+
+        // Apply centering and scaling
+        java.util.List<vec3> vertices = new java.util.ArrayList<>();
+        for (vec3 v : rawVerts) {
+            double x = (v.x - origCenterX + centerX) * scale;
+            double y = (v.y - origCenterY + centerY) * scale;
+            double z = (v.z - origCenterZ + centerZ) * scale;
+            vertices.add(new vec3(x, y, z, 0, 0));
+        }
+
+        // Second pass: parse faces
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 0 || !parts[0].equals("f")) continue;
+
+                vec3[] faceVerts = new vec3[3];
+                for (int i = 0; i < 3; i++) {
+                    String[] tokens = parts[i + 1].split("/");
+                    int vIdx = Integer.parseInt(tokens[0]) - 1;
+                    int uvIdx = tokens.length > 1 && !tokens[1].isEmpty() ? Integer.parseInt(tokens[1]) - 1 : -1;
+                    int nIdx = tokens.length > 2 && !tokens[2].isEmpty() ? Integer.parseInt(tokens[2]) - 1 : -1;
+
+                    vec3 base = vertices.get(vIdx);
+                    vec3 copy = base.copy();
+
+                    if (uvIdx >= 0 && uvIdx < uvs.size()) {
+                        vec2 uv = uvs.get(uvIdx);
+                        copy.u = uv.x;
+                        copy.v = uv.y;
+                    }
+
+                    if (nIdx >= 0 && nIdx < normals.size()) {
+                        vec3 normal = normals.get(nIdx);
+                        copy.nx = normal.x;
+                        copy.ny = normal.y;
+                        copy.nz = normal.z;
+                    }
+
+                    faceVerts[i] = copy;
+                }
+
+                triangles.add(new tri(faceVerts[0], faceVerts[1], faceVerts[2]));
+            }
+        } catch (IOException e) {
+            System.err.println("OBJ face parse failed: " + e.getMessage());
         }
 
         return new mesh(new tri[][] { triangles.toArray(new tri[0]) });
