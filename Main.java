@@ -250,7 +250,7 @@ class AABB {
     }
 }
 
- public class GameObject {
+ class GameObject {
     mesh[] anims;
     AABB hitbox;
     double theta, phi;
