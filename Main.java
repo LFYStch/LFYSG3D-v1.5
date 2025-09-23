@@ -250,10 +250,11 @@ class AABB {
     }
 }
 
-  class GameObject {
+ public class GameObject {
     mesh[] anims;
     AABB hitbox;
-    double theta, phi, cx, cy, cz;
+    double theta, phi;
+    double cx, cy, cz;
 
     public GameObject(mesh[] anims, AABB hitbox, double theta, double phi, double cx, double cy, double cz) {
         this.anims = anims;
@@ -295,7 +296,6 @@ class AABB {
         return lfys;
     }
 }
-
 
 class Objloader {
     public mesh load(String path, double centerX, double centerY, double centerZ, double scale) {
