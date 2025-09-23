@@ -234,6 +234,52 @@ class spawner {
 
 }
 
+public class GameObject {
+    mesh[] anims;
+    AABB hitbox;
+    double theta, phi;
+    double cx, cy, cz;
+
+    public GameObject(mesh[] anims, AABB hitbox, double theta, double phi, double cx, double cy, double cz) {
+        this.anims = anims;
+        this.hitbox = hitbox;
+        this.theta = theta; // Y-axis rotation
+        this.phi = phi;     // Z-axis rotation
+        this.cx = cx;
+        this.cy = cy;
+        this.cz = cz;
+    }
+
+    public mesh getMesh(int AnimIndex) {
+        mesh lfys = anims[AnimIndex];
+
+        for (tri[] row : lfys.tris) {
+            for (tri t : row) {
+                for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
+                    // Translate to origin
+                    double x = v.x - cx;
+                    double y = v.y - cy;
+                    double z = v.z - cz;
+
+                    // Y-axis rotation (around vertical axis)
+                    double x1 = x * Math.cos(theta) - z * Math.sin(theta);
+                    double z1 = x * Math.sin(theta) + z * Math.cos(theta);
+
+                    // Z-axis rotation (around forward axis)
+                    double x2 = x1 * Math.cos(phi) - y * Math.sin(phi);
+                    double y2 = x1 * Math.sin(phi) + y * Math.cos(phi);
+
+                    // Translate back
+                    v.x = x2 + cx;
+                    v.y = y2 + cy;
+                    v.z = z1 + cz;
+                }
+            }
+        }
+
+        return lfys;
+    }
+}
 
 class AABB {
     vec3 min, max;
