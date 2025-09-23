@@ -270,9 +270,9 @@ public class GameObject {
                     double y2 = x1 * Math.sin(phi) + y * Math.cos(phi);
 
                     // Translate back
-                    v.x = x2 + cx;
-                    v.y = y2 + cy;
-                    v.z = z1 + cz;
+                    v.x = x2;
+                    v.y = y2;
+                    v.z = z1;
                 }
             }
         }
