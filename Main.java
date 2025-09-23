@@ -227,7 +227,7 @@ class spawner {
     public mesh LFYS(double x, double y, double z, int aI, double theta, double psi) {
     
     GameObject LFYS = new GameObject(new mesh[]{
-        loader.load("Cube.obj",x,y,z,null)
+        loader.load("Cube.obj",x,y,z,10)
     }, new AABB(new vec3(0, 0, 0, 0, 0), new vec3(0, 0, 0, 0, 0)), theta, psi, x, y, z);
     return LFYS.getMesh(aI);
 }
@@ -250,71 +250,6 @@ class AABB {
     }
 }
 
- public class GameObject {
-    mesh[] anims;
-    AABB hitbox;
-    double theta, phi;
-    vec3 pivot; // Optional pivot point
-
-    public GameObject(mesh[] anims, AABB hitbox, double theta, double phi, vec3 pivot) {
-        this.anims = anims;
-        this.hitbox = hitbox;
-        this.theta = theta;
-        this.phi = phi;
-        this.pivot = pivot;
-    }
-
-    public mesh getMesh(int AnimIndex) {
-        mesh lfys = anims[AnimIndex];
-
-        // If pivot is null, compute mesh center
-        double cx, cy, cz;
-        if (pivot != null) {
-            cx = pivot.x;
-            cy = pivot.y;
-            cz = pivot.z;
-        } else {
-            double sumX = 0, sumY = 0, sumZ = 0;
-            int count = 0;
-            for (tri[] row : lfys.tris) {
-                for (tri t : row) {
-                    for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
-                        sumX += v.x;
-                        sumY += v.y;
-                        sumZ += v.z;
-                        count++;
-                    }
-                }
-            }
-            cx = sumX / count;
-            cy = sumY / count;
-            cz = sumZ / count;
-        }
-
-        // Rotate around pivot
-        for (tri[] row : lfys.tris) {
-            for (tri t : row) {
-                for (vec3 v : new vec3[]{t.v1, t.v2, t.v3}) {
-                    double x = v.x - cx;
-                    double y = v.y - cy;
-                    double z = v.z - cz;
-
-                    double x1 = x * Math.cos(theta) - z * Math.sin(theta);
-                    double z1 = x * Math.sin(theta) + z * Math.cos(theta);
-
-                    double x2 = x1 * Math.cos(phi) - y * Math.sin(phi);
-                    double y2 = x1 * Math.sin(phi) + y * Math.cos(phi);
-
-                    v.x = x2 + cx;
-                    v.y = y2 + cy;
-                    v.z = z1 + cz;
-                }
-            }
-        }
-
-        return lfys;
-    }
-}
 
 class Objloader {
     public mesh load(String path, double centerX, double centerY, double centerZ, double scale) {
